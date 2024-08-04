@@ -1,0 +1,34 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Invoice {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  client_number   String
+  reference_month String
+
+  eletric_energy_quantity Float
+  eletric_energy_price    Float
+
+  sceee_energy_quantity_without_icms Float
+  sceee_energy_price_without_icms    Float
+
+  compensated_energy_quantity Float
+  compensated_energy_price    Float
+
+  municipal_public_lighting_price Float
+}
