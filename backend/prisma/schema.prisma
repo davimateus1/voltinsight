@@ -18,8 +18,8 @@ model Invoice {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  client_number   String
-  reference_month String
+  client_number   String @unique
+  reference_month String 
 
   eletric_energy_quantity Float
   eletric_energy_price    Float
@@ -31,4 +31,6 @@ model Invoice {
   compensated_energy_price    Float
 
   municipal_public_lighting_price Float
+
+  client_document_url String
 }

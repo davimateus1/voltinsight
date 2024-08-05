@@ -1,22 +1,72 @@
-import { db } from "../../utils/prisma";
-import { CreateInvoiceInput } from "./invoice.schema";
+import { PDFExtract } from "pdf.js-extract";
+import { searchInfosInRange } from "../../utils/are-y-close";
 
-export const createInvoice = async (input: CreateInvoiceInput) => {
-  // treat the input and create the invoice
+import {
+  xRangeEndValue,
+  yRangeEndValue,
+  yRangeStartValue,
+  xRangeStartValue,
+  xRangeEndQuantity,
+  yRangeEndQuantity,
+  yRangeStartQuantity,
+  xRangeStartQuantity,
+  xRangeEndClientNumber,
+  yRangeEndClientNumber,
+  yRangeStartClientNumber,
+  yRangeEndReferenceMonth,
+  xRangeEndReferenceMonth,
+  xRangeStartClientNumber,
+  yRangeStartReferenceMonth,
+  xRangeStartReferenceMonth,
+} from "../../contrants";
 
-  const invoice = await db.invoice.create({
-    data: {
-      client_number: "123",
-      compensated_energy_price: 0.1,
-      compensated_energy_quantity: 100,
-      eletric_energy_price: 0.2,
-      eletric_energy_quantity: 200,
-      municipal_public_lighting_price: 0.3,
-      reference_month: "2021-01",
-      sceee_energy_price_without_icms: 0.4,
-      sceee_energy_quantity_without_icms: 400,
-    },
+const pdfExtract = new PDFExtract();
+
+export const createInvoice = async (filename: string) => {
+  pdfExtract.extract("./src/uploads/" + filename, {}, async (err, data) => {
+    if (err) throw new Error(err.message);
+
+    if (!data) throw new Error("No data extracted from PDF");
+
+    const pageContent = data.pages.flatMap((page) => page.content);
+
+    const quantities = searchInfosInRange(
+      pageContent,
+      xRangeStartQuantity,
+      xRangeEndQuantity,
+      yRangeStartQuantity,
+      yRangeEndQuantity
+    );
+
+    const values = searchInfosInRange(
+      pageContent,
+      xRangeStartValue,
+      xRangeEndValue,
+      yRangeStartValue,
+      yRangeEndValue
+    );
+
+    const clientNumber = searchInfosInRange(
+      pageContent,
+      xRangeStartClientNumber,
+      xRangeEndClientNumber,
+      yRangeStartClientNumber,
+      yRangeEndClientNumber
+    );
+
+    const referenceMonth = searchInfosInRange(
+      pageContent,
+      xRangeStartReferenceMonth,
+      xRangeEndReferenceMonth,
+      yRangeStartReferenceMonth,
+      yRangeEndReferenceMonth
+    );
+
+    console.log(values, "valores");
+    console.log(quantities, "quantidades");
+    console.log(clientNumber, "number");
+    console.log(referenceMonth, "month");
   });
 
-  return invoice;
+  return "deu bom";
 };

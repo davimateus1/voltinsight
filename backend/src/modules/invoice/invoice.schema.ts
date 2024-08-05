@@ -1,9 +1,7 @@
 import * as z from "zod";
 import { buildJsonSchemas } from "fastify-zod";
 
-const createInvoiceSchema = z.object({
-  file: z.string({ required_error: "File is required" }),
-});
+const createInvoiceSchema = z.instanceof(Buffer);
 
 export type CreateInvoiceInput = z.infer<typeof createInvoiceSchema>;
 

@@ -1,9 +1,14 @@
 import Fastify from "fastify";
+import multipart from "@fastify/multipart";
 
 import invoiceRoutes from "./modules/invoice/invoice.route";
 import { invoiceSchemas } from "./modules/invoice/invoice.schema";
 
 const server = Fastify();
+
+server.register(multipart, {
+  limits: { fileSize: 10 * 1024 * 1024 },
+});
 
 const start = async () => {
   for (const schema of invoiceSchemas) {
