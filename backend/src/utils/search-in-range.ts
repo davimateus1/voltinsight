@@ -1,4 +1,4 @@
-import { PDFExtractText } from "pdf.js-extract";
+import { PDFExtractText } from 'pdf.js-extract';
 
 const isInRange = (value: number, rangeStart: number, rangeEnd: number) => {
   return value >= rangeStart && value <= rangeEnd;
@@ -17,5 +17,5 @@ export const searchInfosInRange = (
         isInRange(item.x, xRangeStart, xRangeEnd) &&
         isInRange(item.y, yRangeStart, yRangeEnd)
     )
-    .filter((item) => item.str.trim() !== "");
+    .filter((item) => item.str.trim() !== '');
 };

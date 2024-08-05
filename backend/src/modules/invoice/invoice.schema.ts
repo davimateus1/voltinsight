@@ -1,5 +1,5 @@
-import * as z from "zod";
-import { buildJsonSchemas } from "fastify-zod";
+import * as z from 'zod';
+import { buildJsonSchemas } from 'fastify-zod';
 
 const createInvoiceSchema = z.instanceof(Buffer);
 
@@ -17,14 +17,14 @@ const invoiceCore = {
   compensatedEnergyPrice: z.number(),
   municipalPublicLightingPrice: z.number(),
   createdAt: z.string(),
-  updatedAt: z.string(),
+  updatedAt: z.string()
 };
 
 const createInvoiceResponseSchema = z.object({
-  ...invoiceCore,
+  ...invoiceCore
 });
 
 export const { schemas: invoiceSchemas, $ref } = buildJsonSchemas({
   createInvoiceSchema,
-  createInvoiceResponseSchema,
+  createInvoiceResponseSchema
 });
