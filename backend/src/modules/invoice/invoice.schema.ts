@@ -9,22 +9,32 @@ const invoiceCore = {
   id: z.string(),
   clientNumber: z.string(),
   referenceMonth: z.string(),
-  eletricEnergyQuantity: z.number(),
-  eletricEnergyPrice: z.number(),
+  electricEnergyQuantity: z.number(),
+  electricEnergyPrice: z.number(),
   sceeeEnergyQuantityWithoutIcms: z.number(),
   sceeeEnergyPriceWithoutIcms: z.number(),
   compensatedEnergyQuantity: z.number(),
   compensatedEnergyPrice: z.number(),
   municipalPublicLightingPrice: z.number(),
-  createdAt: z.string(),
-  updatedAt: z.string()
+  createdAt: z.string().optional(),
+  updatedAt: z.string().optional()
 };
 
 const createInvoiceResponseSchema = z.object({
   ...invoiceCore
 });
 
+const getInvoiceSchema = z.object({
+  clientNumber: z.string()
+});
+
+export type GetInvoiceInput = z.infer<typeof getInvoiceSchema>;
+
+const getInvoiceResponseSchema = z.array(z.object(invoiceCore));
+
 export const { schemas: invoiceSchemas, $ref } = buildJsonSchemas({
+  getInvoiceSchema,
   createInvoiceSchema,
+  getInvoiceResponseSchema,
   createInvoiceResponseSchema
 });

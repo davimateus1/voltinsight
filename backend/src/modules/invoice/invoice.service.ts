@@ -1,5 +1,10 @@
+import fs from 'fs';
 import { PDFExtract } from 'pdf.js-extract';
 import { v2 as cloudinary } from 'cloudinary';
+
+import { db } from '../../utils/prisma';
+import { replaceValue } from '../../utils/replace-value';
+import { searchInfosInRange } from '../../utils/search-in-range';
 
 import {
   xRangeEndValue,
@@ -19,8 +24,6 @@ import {
   xRangeStartReferenceMonth,
   yRangeStartReferenceMonth
 } from '../../contrants';
-
-import { searchInfosInRange } from '../../utils/search-in-range';
 
 const pdfExtract = new PDFExtract();
 
@@ -64,21 +67,41 @@ export const createInvoice = async (filename: string) => {
       yRangeEndReferenceMonth
     );
 
-    // console.log(values, 'valores');
-    // console.log(quantities, 'quantidades');
-    // console.log(clientNumber, 'number');
-    // console.log(referenceMonth, 'month');
+    const uploadedFile = await cloudinary.uploader
+      .upload('./src/uploads/' + filename, { folder: 'voltinsight' })
+      .then((result) => result.url)
+      .catch((err) => {
+        throw new Error(err.message);
+      });
+
+    db.invoice
+      .create({
+        data: {
+          clientDocumentUrl: uploadedFile,
+          clientNumber: clientNumber[0].str,
+          referenceMonth: referenceMonth[0].str,
+          electricEnergyPrice: replaceValue(values[0].str),
+          sceeeEnergyPriceWithoutIcms: replaceValue(values[1].str),
+          compensatedEnergyPrice: replaceValue(values[2].str),
+          municipalPublicLightingPrice: replaceValue(values[3].str),
+          electricEnergyQuantity: replaceValue(quantities[0].str),
+          sceeeEnergyQuantityWithoutIcms: replaceValue(quantities[1].str),
+          compensatedEnergyQuantity: replaceValue(quantities[2].str)
+        }
+      })
+      .catch((err) => {
+        throw new Error(err.message);
+      });
+
+    fs.unlinkSync('./src/uploads/' + filename);
   });
 
-  const uploadedFile = await cloudinary.uploader
-    .upload('./src/uploads/' + filename, { folder: 'voltinsight' })
-    .then((result) => result.url)
-    .catch((err) => {
-      console.log(JSON.stringify(err, null, 2));
-      throw new Error(err.message);
-    });
+  return 'Invoice created successfully';
+};
 
-  console.log(uploadedFile, 'uploaded file');
-
-  return 'deu bom';
+export const getInvoices = async (clientNumber: string) => {
+  return await db.invoice.findMany({
+    where: { clientNumber },
+    orderBy: { createdAt: 'desc' }
+  });
 };

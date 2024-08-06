@@ -1,6 +1,10 @@
 import { $ref } from './invoice.schema';
 import { FastifyInstance } from 'fastify';
-import { registerInvoiceHandler } from './invoice.controller';
+
+import {
+  getInvoicesHandler,
+  registerInvoiceHandler
+} from './invoice.controller';
 
 const invoiceRoutes = async (server: FastifyInstance) => {
   server.post(
@@ -14,6 +18,19 @@ const invoiceRoutes = async (server: FastifyInstance) => {
       }
     },
     registerInvoiceHandler
+  );
+
+  server.get(
+    '/:clientNumber',
+    {
+      schema: {
+        params: $ref('getInvoiceSchema'),
+        response: {
+          200: $ref('getInvoiceResponseSchema')
+        }
+      }
+    },
+    getInvoicesHandler
   );
 };
 

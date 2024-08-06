@@ -1,4 +1,7 @@
 {
+  "scripts": {
+    "dev": "tsnd --respawn --transpile-only --exit-child src/app.ts"
+  },
   "dependencies": {
     "@fastify/formbody": "^7.4.0",
     "@fastify/multipart": "^8.3.0",
@@ -12,10 +15,6 @@
     "pdf2json": "^3.1.3",
     "zod": "^3.23.8",
     "zod-form-data": "^2.0.2"
-  },
-  "scripts": {
-    "dev": "tsnd --respawn --transpile-only --exit-child src/app.ts",
-    "lint:ts": "ESLINT_USE_FLAT_CONFIG=false eslint --config eslint.config.js src/"
   },
   "devDependencies": {
     "@rocketseat/eslint-config": "^2.2.2",
