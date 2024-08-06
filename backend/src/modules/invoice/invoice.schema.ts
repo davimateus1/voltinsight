@@ -9,6 +9,7 @@ const invoiceCore = {
   id: z.string(),
   clientNumber: z.string(),
   referenceMonth: z.string(),
+  clientDocumentUrl: z.string(),
   electricEnergyQuantity: z.number(),
   electricEnergyPrice: z.number(),
   sceeeEnergyQuantityWithoutIcms: z.number(),

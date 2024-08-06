@@ -1,4 +1,6 @@
 import Fastify from 'fastify';
+import cors from '@fastify/cors';
+
 import multipart from '@fastify/multipart';
 import { cloudinaryConfig } from './utils/cloudinary';
 
@@ -7,10 +9,6 @@ import { invoiceSchemas } from './modules/invoice/invoice.schema';
 
 const server = Fastify();
 
-server.register(multipart, {
-  limits: { fileSize: 10 * 1024 * 1024 }
-});
-
 const start = async () => {
   cloudinaryConfig();
 
@@ -18,6 +16,11 @@ const start = async () => {
     server.addSchema(schema);
   }
 
+  server.register(multipart, {
+    limits: { fileSize: 10 * 1024 * 1024 }
+  });
+
+  server.register(cors, { origin: '*' });
   server.register(invoiceRoutes, { prefix: 'api/invoices' });
 
   try {
