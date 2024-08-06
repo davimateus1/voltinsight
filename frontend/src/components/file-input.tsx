@@ -1,18 +1,18 @@
-"use client";
-
-import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
+import { Input } from "@/components/ui/input";
+
 import {
+  useRef,
   Dispatch,
-  SetStateAction,
-  createContext,
+  useState,
+  useEffect,
+  useContext,
   forwardRef,
   useCallback,
-  useContext,
-  useEffect,
-  useRef,
-  useState,
+  createContext,
+  SetStateAction,
 } from "react";
+
 import {
   useDropzone,
   DropzoneState,

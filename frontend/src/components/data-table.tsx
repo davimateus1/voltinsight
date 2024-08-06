@@ -1,6 +1,9 @@
-"use client";
-
 import * as React from "react";
+import { Invoice } from "@/types";
+
+import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
+
 import {
   ColumnDef,
   ColumnFiltersState,
@@ -13,10 +16,16 @@ import {
   getSortedRowModel,
   useReactTable,
 } from "@tanstack/react-table";
-import { ArrowUpDown, ChevronDown, MoreHorizontal } from "lucide-react";
 
-import { Button } from "@/components/ui/button";
-import { Checkbox } from "@/components/ui/checkbox";
+import {
+  ArrowLeft,
+  ArrowRight,
+  ArrowUpDown,
+  ChevronDown,
+  MoreHorizontal,
+  XIcon,
+} from "lucide-react";
+
 import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
@@ -26,7 +35,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Input } from "@/components/ui/input";
+
 import {
   Table,
   TableBody,
@@ -36,65 +45,20 @@ import {
   TableRow,
 } from "@/components/ui/table";
 
-const data: Payment[] = [
-  {
-    id: "m5gr84i9",
-    amount: 316,
-    status: "success",
-    email: "ken99@yahoo.com",
-  },
-  {
-    id: "3u1reuv4",
-    amount: 242,
-    status: "success",
-    email: "Abe45@gmail.com",
-  },
-  {
-    id: "derv1ws0",
-    amount: 837,
-    status: "processing",
-    email: "Monserrat44@gmail.com",
-  },
-  {
-    id: "5kma53ae",
-    amount: 874,
-    status: "success",
-    email: "Silas22@gmail.com",
-  },
-  {
-    id: "bhqecj4p",
-    amount: 721,
-    status: "failed",
-    email: "carmella@hotmail.com",
-  },
-  {
-    id: "6w3j4k8d",
-    amount: 424,
-    status: "success",
-    email: "d@ok.com",
-  },
-  {
-    id: "rj4k8d6w",
-    amount: 424,
-    status: "success",
-    email: "dasdsad@ok.com",
-  },
-  {
-    id: "4k8d6w3j",
-    amount: 424,
-    status: "success",
-    email: "asdasd@Ok.om",
-  },
-];
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { toast } from "sonner";
 
-export type Payment = {
-  id: string;
-  amount: number;
-  status: "pending" | "processing" | "success" | "failed";
-  email: string;
-};
+interface DataTableProps {
+  data: Invoice[];
+}
 
-export const columns: ColumnDef<Payment>[] = [
+export const columns: ColumnDef<Invoice>[] = [
   {
     id: "select",
     header: ({ table }) => (
@@ -118,46 +82,108 @@ export const columns: ColumnDef<Payment>[] = [
     enableHiding: false,
   },
   {
-    accessorKey: "status",
-    header: "Status",
+    accessorKey: "clientNumber",
+    header: "Client",
     cell: ({ row }) => (
-      <div className="capitalize">{row.getValue("status")}</div>
+      <div className="capitalize">{row.getValue("clientNumber")}</div>
     ),
   },
   {
-    accessorKey: "email",
+    accessorKey: "referenceMonth",
     header: ({ column }) => {
       return (
-        <Button
-          variant="ghost"
+        <button
+          className="p-0 flex items-center justify-center space-x-2"
           onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
         >
-          Email
+          Month/Year
           <ArrowUpDown className="ml-2 h-4 w-4" />
-        </Button>
+        </button>
       );
     },
-    cell: ({ row }) => <div className="lowercase">{row.getValue("email")}</div>,
+    cell: ({ row }) => (
+      <div className="uppercase">{row.getValue("referenceMonth")}</div>
+    ),
   },
   {
-    accessorKey: "amount",
-    header: () => <div className="text-right">Amount</div>,
+    accessorKey: "eletricEnergy",
+    header: () => <div className="text-left">Elec. Energy</div>,
     cell: ({ row }) => {
-      const amount = parseFloat(row.getValue("amount"));
+      const quantity = row.original.electricEnergyQuantity;
+      const price = row.original.electricEnergyPrice;
 
-      const formatted = new Intl.NumberFormat("en-US", {
+      const formattedPrice = new Intl.NumberFormat("pt-BR", {
         style: "currency",
-        currency: "USD",
-      }).format(amount);
+        currency: "BRL",
+      }).format(price);
 
-      return <div className="text-right font-medium">{formatted}</div>;
+      return (
+        <div className="text-left font-medium">
+          {quantity} KWh - {formattedPrice}
+        </div>
+      );
+    },
+  },
+  {
+    accessorKey: "sceeEnergy",
+    header: () => <div className="text-left">SCEE. Energy W/O ICMS </div>,
+    cell: ({ row }) => {
+      const quantity = row.original.sceeeEnergyQuantityWithoutIcms;
+      const price = row.original.sceeeEnergyPriceWithoutIcms;
+
+      const formattedPrice = new Intl.NumberFormat("pt-BR", {
+        style: "currency",
+        currency: "BRL",
+      }).format(price);
+
+      return (
+        <div className="text-left font-medium">
+          {quantity} KWh - {formattedPrice}
+        </div>
+      );
+    },
+  },
+  {
+    accessorKey: "compensatedEnergy",
+    header: () => <div className="text-left">Compen. Energy</div>,
+    cell: ({ row }) => {
+      const quantity = row.original.compensatedEnergyQuantity;
+      const price = row.original.compensatedEnergyPrice;
+
+      const formattedPrice = new Intl.NumberFormat("pt-BR", {
+        style: "currency",
+        currency: "BRL",
+      }).format(price);
+
+      return (
+        <div className="text-left font-medium">
+          {quantity} KWh - {formattedPrice}
+        </div>
+      );
+    },
+  },
+  {
+    accessorKey: "publicEnergy",
+    header: () => <div className="text-left">Public Energy</div>,
+    cell: ({ row }) => {
+      const price = row.original.municipalPublicLightingPrice;
+
+      const formattedPrice = new Intl.NumberFormat("pt-BR", {
+        style: "currency",
+        currency: "BRL",
+      }).format(price);
+
+      return <div className="text-left font-medium">{formattedPrice}</div>;
     },
   },
   {
     id: "actions",
     enableHiding: false,
     cell: ({ row }) => {
-      const payment = row.original;
+      const handleCopyClientNumber = () => {
+        navigator.clipboard.writeText(row.original.clientNumber);
+        toast("Copied client number to clipboard! 📋🚀", { duration: 2500 });
+      };
 
       return (
         <DropdownMenu>
@@ -169,14 +195,11 @@ export const columns: ColumnDef<Payment>[] = [
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
             <DropdownMenuLabel>Actions</DropdownMenuLabel>
-            <DropdownMenuItem
-              onClick={() => navigator.clipboard.writeText(payment.id)}
-            >
-              Copy payment ID
+            <DropdownMenuItem onClick={handleCopyClientNumber}>
+              Copy client number
             </DropdownMenuItem>
             <DropdownMenuSeparator />
-            <DropdownMenuItem>View customer</DropdownMenuItem>
-            <DropdownMenuItem>View payment details</DropdownMenuItem>
+            <DropdownMenuItem>Download invoice</DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
       );
@@ -184,7 +207,7 @@ export const columns: ColumnDef<Payment>[] = [
   },
 ];
 
-export const DataTable = () => {
+export const DataTable = ({ data }: DataTableProps) => {
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
     []
@@ -211,11 +234,33 @@ export const DataTable = () => {
       rowSelection,
     },
     initialState: {
-      pagination: {
-        pageSize: 5,
-      },
+      pagination: { pageSize: 5 },
     },
   });
+
+  const [selectedClientNumber, setSelectedClientNumber] = React.useState(
+    (table?.getColumn("clientNumber")?.getFilterValue() as string) || ""
+  );
+
+  const handleSelectChange = (value: string) => {
+    setSelectedClientNumber(value);
+    table?.getColumn("clientNumber")?.setFilterValue(value);
+  };
+
+  const handleClear = () => {
+    setSelectedClientNumber("");
+    table?.getColumn("clientNumber")?.setFilterValue("");
+  };
+
+  const uniqueClientNumbers = Array.from(
+    new Set(data.map((invoice) => invoice.clientNumber))
+  );
+
+  const camelToTitleCase = (str: string) => {
+    return str
+      .replace(/([a-z])([A-Z])/g, "$1 $2")
+      .replace(/(^\w{1})|(\s+\w{1})/g, (letter) => letter.toUpperCase());
+  };
 
   return (
     <div className="w-full">
@@ -223,14 +268,31 @@ export const DataTable = () => {
         Electric Data Library
       </h1>
       <div className="flex items-center py-4">
-        <Input
-          placeholder="Filter emails..."
-          value={(table.getColumn("email")?.getFilterValue() as string) ?? ""}
-          onChange={(event) =>
-            table.getColumn("email")?.setFilterValue(event.target.value)
-          }
-          className="max-w-sm"
-        />
+        <div className="flex items-center justify-center space-x-2">
+          <Select
+            value={selectedClientNumber}
+            onValueChange={handleSelectChange}
+          >
+            <SelectTrigger className="w-[240px]">
+              <SelectValue placeholder="Client Number" />
+            </SelectTrigger>
+            <SelectContent>
+              {uniqueClientNumbers.map((clientNumber) => (
+                <SelectItem key={clientNumber} value={clientNumber}>
+                  {clientNumber}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          <Button
+            variant="outline"
+            onClick={handleClear}
+            disabled={!selectedClientNumber}
+            className="transition-all duration-500"
+          >
+            <XIcon className="h-[1.4rem] w-[1.4rem] text-red-500" />
+          </Button>
+        </div>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="outline" className="ml-auto">
@@ -251,7 +313,7 @@ export const DataTable = () => {
                       column.toggleVisibility(!!value)
                     }
                   >
-                    {column.id}
+                    {camelToTitleCase(column.id)}
                   </DropdownMenuCheckboxItem>
                 );
               })}
@@ -287,7 +349,10 @@ export const DataTable = () => {
                   data-state={row.getIsSelected() && "selected"}
                 >
                   {row.getVisibleCells().map((cell) => (
-                    <TableCell key={cell.id} className="text-gray-900 text-[1rem]">
+                    <TableCell
+                      key={cell.id}
+                      className="text-gray-900 text-[1rem]"
+                    >
                       {flexRender(
                         cell.column.columnDef.cell,
                         cell.getContext()
@@ -297,12 +362,12 @@ export const DataTable = () => {
                 </TableRow>
               ))
             ) : (
-              <TableRow>
+              <TableRow className="bg-white/30">
                 <TableCell
                   colSpan={columns.length}
                   className="h-24 text-center"
                 >
-                  No results.
+                  No data available.
                 </TableCell>
               </TableRow>
             )}
@@ -321,7 +386,7 @@ export const DataTable = () => {
             onClick={() => table.previousPage()}
             disabled={!table.getCanPreviousPage()}
           >
-            Previous
+            <ArrowLeft className="h-4 w-4" />
           </Button>
           <Button
             variant="outline"
@@ -329,7 +394,7 @@ export const DataTable = () => {
             onClick={() => table.nextPage()}
             disabled={!table.getCanNextPage()}
           >
-            Next
+            <ArrowRight className="h-4 w-4" />
           </Button>
         </div>
       </div>
