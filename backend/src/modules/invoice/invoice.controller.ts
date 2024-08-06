@@ -4,7 +4,6 @@ import { pipeline } from 'stream';
 
 import { FastifyReply, FastifyRequest } from 'fastify';
 import { createInvoice, getInvoices } from './invoice.service';
-import { $ref } from './invoice.schema';
 
 const pump = util.promisify(pipeline);
 

@@ -25,7 +25,7 @@ const createInvoiceResponseSchema = z.object({
 });
 
 const getInvoiceSchema = z.object({
-  clientNumber: z.string()
+  clientNumber: z.string().optional()
 });
 
 export type GetInvoiceInput = z.infer<typeof getInvoiceSchema>;

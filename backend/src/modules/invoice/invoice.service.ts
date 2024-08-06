@@ -99,9 +99,9 @@ export const createInvoice = async (filename: string) => {
   return 'Invoice created successfully';
 };
 
-export const getInvoices = async (clientNumber: string) => {
+export const getInvoices = async (clientNumber?: string) => {
   return await db.invoice.findMany({
-    where: { clientNumber },
-    orderBy: { createdAt: 'desc' }
+    orderBy: { createdAt: 'desc' },
+    ...(clientNumber && { where: { clientNumber } })
   });
 };

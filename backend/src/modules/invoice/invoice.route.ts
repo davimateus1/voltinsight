@@ -21,7 +21,7 @@ const invoiceRoutes = async (server: FastifyInstance) => {
   );
 
   server.get(
-    '/:clientNumber',
+    '/:clientNumber?',
     {
       schema: {
         params: $ref('getInvoiceSchema'),
