@@ -2,6 +2,7 @@ import { useGetInvoices } from "@/services/hooks";
 import { DataTable } from "@/components/data-table";
 
 import { LineVariant } from "@/components/line-variant";
+import { ChartSkeleton } from "../skeletons/chart-skeleton";
 import { TableSkeleton } from "@/components/skeletons/table-skeleton";
 
 export const DashboardSection = () => {
@@ -41,22 +42,34 @@ export const DashboardSection = () => {
   return (
     <div className="w-3/4 bg-sky-100/5 rounded-lg p-4 h-full overflow-y-auto">
       <div className="flex justify-around items-center w-full">
-        <LineVariant
-          isKwh
-          xDataKey="name"
-          dataKeys={energyKeys}
-          colors={energyColors}
-          data={energyData ?? []}
-          title="Electric Energy (kWh)"
-        />
-        <LineVariant
-          xDataKey="name"
-          dataKeys={monetaryKeys}
-          colors={monetaryColors}
-          data={monetaryData ?? []}
-          title="Monetary Data (R$)"
-        />
+        {isLoading ? (
+          <ChartSkeleton />
+        ) : (
+          <LineVariant
+            isKwh
+            xDataKey="name"
+            dataKeys={energyKeys}
+            colors={energyColors}
+            selectData={data ?? []}
+            chartData={energyData ?? []}
+            title="Electric Energy (kWh)"
+          />
+        )}
+
+        {isLoading ? (
+          <ChartSkeleton />
+        ) : (
+          <LineVariant
+            xDataKey="name"
+            selectData={data ?? []}
+            dataKeys={monetaryKeys}
+            colors={monetaryColors}
+            title="Monetary Data (R$)"
+            chartData={monetaryData ?? []}
+          />
+        )}
       </div>
+
       <div className="w-full h-px bg-gray-200 my-4" />
       {isLoading ? <TableSkeleton /> : <DataTable data={data ?? []} />}
     </div>

@@ -3,6 +3,7 @@ import { Invoice } from "@/types";
 
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
+import { getUniqueClientNumbers } from "@/lib/utils";
 
 import {
   ColumnDef,
@@ -182,7 +183,10 @@ export const columns: ColumnDef<Invoice>[] = [
     cell: ({ row }) => {
       const handleCopyClientNumber = () => {
         navigator.clipboard.writeText(row.original.clientNumber);
-        toast("Copied client number to clipboard! 📋🚀", { duration: 2500 });
+        toast.success("Copied client number to clipboard! 📋🚀", {
+          duration: 2500,
+          className: "bg-green-300 text-gray-900 text-md",
+        });
       };
 
       return (
@@ -252,10 +256,6 @@ export const DataTable = ({ data }: DataTableProps) => {
     table?.getColumn("clientNumber")?.setFilterValue("");
   };
 
-  const uniqueClientNumbers = Array.from(
-    new Set(data.map((invoice) => invoice.clientNumber))
-  );
-
   const camelToTitleCase = (str: string) => {
     return str
       .replace(/([a-z])([A-Z])/g, "$1 $2")
@@ -277,7 +277,7 @@ export const DataTable = ({ data }: DataTableProps) => {
               <SelectValue placeholder="Client Number" />
             </SelectTrigger>
             <SelectContent>
-              {uniqueClientNumbers.map((clientNumber) => (
+              {getUniqueClientNumbers(data).map((clientNumber) => (
                 <SelectItem key={clientNumber} value={clientNumber}>
                   {clientNumber}
                 </SelectItem>
@@ -288,7 +288,7 @@ export const DataTable = ({ data }: DataTableProps) => {
             variant="outline"
             onClick={handleClear}
             disabled={!selectedClientNumber}
-            className="transition-all duration-500"
+            className="transition-all duration-500 w-[2.5rem] p-1 h-[2.5rem] rounded-full"
           >
             <XIcon className="h-[1.4rem] w-[1.4rem] text-red-500" />
           </Button>

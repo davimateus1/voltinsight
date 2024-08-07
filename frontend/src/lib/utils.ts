@@ -1,6 +1,12 @@
-import { type ClassValue, clsx } from "clsx"
-import { twMerge } from "tailwind-merge"
+import { Invoice } from "@/types";
 
-export function cn(...inputs: ClassValue[]) {
-  return twMerge(clsx(inputs))
-}
+import { twMerge } from "tailwind-merge";
+import { type ClassValue, clsx } from "clsx";
+
+export const cn = (...inputs: ClassValue[]) => {
+  return twMerge(clsx(inputs));
+};
+
+export const getUniqueClientNumbers = (data: Invoice[]) => {
+  return Array.from(new Set(data.map((invoice) => invoice.clientNumber)));
+};
