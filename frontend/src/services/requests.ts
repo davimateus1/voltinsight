@@ -19,3 +19,12 @@ export const getMonetaryInvoices = async (
   const response = await apiInstance.get(`/invoices/${clientNumber}`);
   return response.data;
 };
+
+export const uploadInvoice = async (file: File): Promise<void> => {
+  const formData = new FormData();
+  formData.append("file", file);
+
+  await apiInstance.post("/invoices", formData, {
+    headers: { "Content-Type": "multipart/form-data" },
+  });
+};

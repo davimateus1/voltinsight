@@ -100,8 +100,11 @@ export const createInvoice = async (filename: string) => {
 };
 
 export const getInvoices = async (clientNumber?: string) => {
-  return await db.invoice.findMany({
-    orderBy: { createdAt: 'desc' },
+  const result = await db.invoice.findMany({
+    orderBy: { referenceMonth: 'asc' },
     ...(clientNumber && { where: { clientNumber } })
   });
+
+  //TODO: SORT BY DATE
+  return result;
 };

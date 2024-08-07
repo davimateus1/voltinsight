@@ -14,6 +14,21 @@ export type Invoice = {
   sceeeEnergyQuantityWithoutIcms: number;
 };
 
+export type EnergyItem = {
+  referenceMonth: string;
+  electricEnergyQuantity: number;
+  compensatedEnergyQuantity: number;
+  sceeeEnergyQuantityWithoutIcms: number;
+};
+
+export type MonetaryItem = {
+  referenceMonth: string;
+  electricEnergyPrice: number;
+  compensatedEnergyPrice: number;
+  sceeeEnergyPriceWithoutIcms: number;
+  municipalPublicLightingPrice: number;
+};
+
 export type Filters = {
   monetaryData: string;
   electricEnergy: string;

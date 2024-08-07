@@ -1,5 +1,9 @@
 import { useState } from "react";
-import { ChartType } from "@/types";
+import { DataTable } from "@/components/data-table";
+
+import { LineVariant } from "@/components/line-variant";
+import { aggregateDataByMonth } from "@/utils/aggregate-data";
+import { ChartType, EnergyItem, MonetaryItem } from "@/types";
 
 import {
   energyKeys,
@@ -13,9 +17,6 @@ import {
   useGetEnergyInvoices,
   useGetMonetaryInvoices,
 } from "@/services/hooks";
-
-import { DataTable } from "@/components/data-table";
-import { LineVariant } from "@/components/line-variant";
 
 export const DashboardSection = () => {
   const [filters, setFilters] = useState({
@@ -32,8 +33,18 @@ export const DashboardSection = () => {
     filters.monetaryData
   );
 
+  const aggregatedEnergyData = aggregateDataByMonth<EnergyItem>(
+    energyChartData,
+    Object.entries(energyKeys).map(([, value]) => value as keyof EnergyItem)
+  );
+
+  const aggregatedMonetaryData = aggregateDataByMonth<MonetaryItem>(
+    monetaryChartData,
+    Object.entries(monetaryKeys).map(([, value]) => value as keyof MonetaryItem)
+  );
+
   const energyData =
-    energyChartData?.map((item) => ({
+    aggregatedEnergyData.map((item) => ({
       name: item.referenceMonth,
       electricEnergyQuantity: item.electricEnergyQuantity,
       compensatedEnergyQuantity: item.compensatedEnergyQuantity,
@@ -41,7 +52,7 @@ export const DashboardSection = () => {
     })) ?? [];
 
   const monetaryData =
-    monetaryChartData?.map((item) => ({
+    aggregatedMonetaryData.map((item) => ({
       name: item.referenceMonth,
       electricEnergyPrice: item.electricEnergyPrice,
       compensatedEnergyPrice: item.compensatedEnergyPrice,
