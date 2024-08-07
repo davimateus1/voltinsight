@@ -1,11 +1,12 @@
 import { useState } from "react";
+import { Button } from "@/components/ui/button";
+
 import {
   FileInput,
   FileUploader,
   FileUploaderItem,
   FileUploaderContent,
-} from "../file-input";
-import { Button } from "../ui/button";
+} from "@/components/file-input";
 
 export const UploadSection = () => {
   const [files, setFiles] = useState<File[] | null>(null);

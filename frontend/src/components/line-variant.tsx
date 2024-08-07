@@ -1,10 +1,10 @@
-import { useState } from "react";
 import { Invoice } from "@/types";
-import { Button } from "./ui/button";
-
 import { Frown, XIcon } from "lucide-react";
-import { CustomTooltip } from "./custom-tooltip";
+import { Button } from "@/components/ui/button";
+
 import { getUniqueClientNumbers } from "@/lib/utils";
+import { CustomTooltip } from "@/components/custom-tooltip";
+import { ChartSkeleton } from "@/components/skeletons/chart-skeleton";
 
 import {
   Line,
@@ -30,9 +30,13 @@ interface LineVariantProps {
   isKwh?: boolean;
   xDataKey: string;
   colors: string[];
+  isLoading: boolean;
   selectData: Invoice[];
+  clientNumber: string;
+  handleClear: () => void;
   dataKeys: { [key: string]: string };
   chartData: { [key: string]: string | number }[];
+  handleClientNumberChange: (clientNumber: string) => void;
 }
 
 export const LineVariant = ({
@@ -41,23 +45,19 @@ export const LineVariant = ({
   xDataKey,
   dataKeys,
   chartData,
+  isLoading,
   selectData,
+  handleClear,
+  clientNumber,
   isKwh = false,
+  handleClientNumberChange,
 }: LineVariantProps) => {
-  const [selectedClientNumber, setSelectedClientNumber] = useState("");
-
-  const handleSelectChange = (value: string) => {
-    setSelectedClientNumber(value);
-  };
-
-  const handleClear = () => {
-    setSelectedClientNumber("");
-  };
+  if (isLoading) return <ChartSkeleton />;
 
   return (
     <div className="w-[46.5%] space-y-1 flex flex-col items-end">
       <div className="flex items-center justify-center space-x-2">
-        <Select value={selectedClientNumber} onValueChange={handleSelectChange}>
+        <Select value={clientNumber} onValueChange={handleClientNumberChange}>
           <SelectTrigger className="w-[140px] h-8">
             <SelectValue placeholder="Client Number" />
           </SelectTrigger>
@@ -72,7 +72,7 @@ export const LineVariant = ({
         <Button
           variant="outline"
           onClick={handleClear}
-          disabled={!selectedClientNumber}
+          disabled={!clientNumber}
           className="transition-all duration-500 w-[2rem] p-1 h-[2rem] rounded-full"
         >
           <XIcon className="h-[1rem] w-[1rem] text-red-500" />

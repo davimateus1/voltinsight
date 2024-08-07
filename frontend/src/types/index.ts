@@ -13,3 +13,10 @@ export type Invoice = {
   municipalPublicLightingPrice: number;
   sceeeEnergyQuantityWithoutIcms: number;
 };
+
+export type Filters = {
+  monetaryData: string;
+  electricEnergy: string;
+};
+
+export type ChartType = "monetaryData" | "electricEnergy";

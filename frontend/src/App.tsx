@@ -1,5 +1,5 @@
 import { UploadSection } from "@/components/sections/upload";
-import { DashboardSection } from "./components/sections/dashboard";
+import { DashboardSection } from "@/components/sections/dashboard";
 
 const App = () => {
   return (

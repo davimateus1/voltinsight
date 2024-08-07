@@ -1,217 +1,55 @@
 import * as React from "react";
 import { Invoice } from "@/types";
+import { columns } from "@/utils/columns";
 
 import { Button } from "@/components/ui/button";
-import { Checkbox } from "@/components/ui/checkbox";
 import { getUniqueClientNumbers } from "@/lib/utils";
+import { TableSkeleton } from "@/components/skeletons/table-skeleton";
+
+import { ArrowLeft, ArrowRight, ChevronDown, XIcon } from "lucide-react";
 
 import {
-  ColumnDef,
-  ColumnFiltersState,
-  SortingState,
-  VisibilityState,
   flexRender,
+  SortingState,
+  useReactTable,
   getCoreRowModel,
+  VisibilityState,
+  getSortedRowModel,
+  ColumnFiltersState,
   getFilteredRowModel,
   getPaginationRowModel,
-  getSortedRowModel,
-  useReactTable,
 } from "@tanstack/react-table";
 
 import {
-  ArrowLeft,
-  ArrowRight,
-  ArrowUpDown,
-  ChevronDown,
-  MoreHorizontal,
-  XIcon,
-} from "lucide-react";
-
-import {
   DropdownMenu,
-  DropdownMenuCheckboxItem,
   DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
   DropdownMenuTrigger,
+  DropdownMenuCheckboxItem,
 } from "@/components/ui/dropdown-menu";
 
 import {
   Table,
+  TableRow,
   TableBody,
   TableCell,
   TableHead,
   TableHeader,
-  TableRow,
 } from "@/components/ui/table";
 
 import {
   Select,
-  SelectContent,
   SelectItem,
-  SelectTrigger,
   SelectValue,
+  SelectTrigger,
+  SelectContent,
 } from "@/components/ui/select";
-import { toast } from "sonner";
 
 interface DataTableProps {
   data: Invoice[];
+  isLoading: boolean;
 }
 
-export const columns: ColumnDef<Invoice>[] = [
-  {
-    id: "select",
-    header: ({ table }) => (
-      <Checkbox
-        checked={
-          table.getIsAllPageRowsSelected() ||
-          (table.getIsSomePageRowsSelected() && "indeterminate")
-        }
-        onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
-        aria-label="Select all"
-      />
-    ),
-    cell: ({ row }) => (
-      <Checkbox
-        checked={row.getIsSelected()}
-        onCheckedChange={(value) => row.toggleSelected(!!value)}
-        aria-label="Select row"
-      />
-    ),
-    enableSorting: false,
-    enableHiding: false,
-  },
-  {
-    accessorKey: "clientNumber",
-    header: "Client",
-    cell: ({ row }) => (
-      <div className="capitalize">{row.getValue("clientNumber")}</div>
-    ),
-  },
-  {
-    accessorKey: "referenceMonth",
-    header: ({ column }) => {
-      return (
-        <button
-          className="p-0 flex items-center justify-center space-x-2"
-          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-        >
-          Month/Year
-          <ArrowUpDown className="ml-2 h-4 w-4" />
-        </button>
-      );
-    },
-    cell: ({ row }) => (
-      <div className="uppercase">{row.getValue("referenceMonth")}</div>
-    ),
-  },
-  {
-    accessorKey: "eletricEnergy",
-    header: () => <div className="text-left">Elec. Energy</div>,
-    cell: ({ row }) => {
-      const quantity = row.original.electricEnergyQuantity;
-      const price = row.original.electricEnergyPrice;
-
-      const formattedPrice = new Intl.NumberFormat("pt-BR", {
-        style: "currency",
-        currency: "BRL",
-      }).format(price);
-
-      return (
-        <div className="text-left font-medium">
-          {quantity} KWh - {formattedPrice}
-        </div>
-      );
-    },
-  },
-  {
-    accessorKey: "sceeEnergy",
-    header: () => <div className="text-left">SCEE. Energy W/O ICMS </div>,
-    cell: ({ row }) => {
-      const quantity = row.original.sceeeEnergyQuantityWithoutIcms;
-      const price = row.original.sceeeEnergyPriceWithoutIcms;
-
-      const formattedPrice = new Intl.NumberFormat("pt-BR", {
-        style: "currency",
-        currency: "BRL",
-      }).format(price);
-
-      return (
-        <div className="text-left font-medium">
-          {quantity} KWh - {formattedPrice}
-        </div>
-      );
-    },
-  },
-  {
-    accessorKey: "compensatedEnergy",
-    header: () => <div className="text-left">Compen. Energy</div>,
-    cell: ({ row }) => {
-      const quantity = row.original.compensatedEnergyQuantity;
-      const price = row.original.compensatedEnergyPrice;
-
-      const formattedPrice = new Intl.NumberFormat("pt-BR", {
-        style: "currency",
-        currency: "BRL",
-      }).format(price);
-
-      return (
-        <div className="text-left font-medium">
-          {quantity} KWh - {formattedPrice}
-        </div>
-      );
-    },
-  },
-  {
-    accessorKey: "publicEnergy",
-    header: () => <div className="text-left">Public Energy</div>,
-    cell: ({ row }) => {
-      const price = row.original.municipalPublicLightingPrice;
-
-      const formattedPrice = new Intl.NumberFormat("pt-BR", {
-        style: "currency",
-        currency: "BRL",
-      }).format(price);
-
-      return <div className="text-left font-medium">{formattedPrice}</div>;
-    },
-  },
-  {
-    id: "actions",
-    enableHiding: false,
-    cell: ({ row }) => {
-      const handleCopyClientNumber = () => {
-        navigator.clipboard.writeText(row.original.clientNumber);
-        toast.success("Copied client number to clipboard! 📋🚀", {
-          duration: 2500,
-          className: "bg-green-300 text-gray-900 text-md",
-        });
-      };
-
-      return (
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="ghost" className="h-8 w-8 p-0">
-              <span className="sr-only">Open menu</span>
-              <MoreHorizontal className="h-4 w-4" />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            <DropdownMenuLabel>Actions</DropdownMenuLabel>
-            <DropdownMenuItem onClick={handleCopyClientNumber}>
-              Copy client number
-            </DropdownMenuItem>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem>Download invoice</DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
-      );
-    },
-  },
-];
-
-export const DataTable = ({ data }: DataTableProps) => {
+export const DataTable = ({ data, isLoading }: DataTableProps) => {
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
     []
@@ -261,6 +99,8 @@ export const DataTable = ({ data }: DataTableProps) => {
       .replace(/([a-z])([A-Z])/g, "$1 $2")
       .replace(/(^\w{1})|(\s+\w{1})/g, (letter) => letter.toUpperCase());
   };
+
+  if (isLoading) return <TableSkeleton />;
 
   return (
     <div className="w-full">
