@@ -100,11 +100,36 @@ export const createInvoice = async (filename: string) => {
 };
 
 export const getInvoices = async (clientNumber?: string) => {
+  const monthIndex: { [key: string]: number } = {
+    JAN: 0,
+    FEV: 1,
+    MAR: 2,
+    ABR: 3,
+    MAI: 4,
+    JUN: 5,
+    JUL: 6,
+    AGO: 7,
+    SET: 8,
+    OUT: 9,
+    NOV: 10,
+    DEZ: 11
+  };
+
   const result = await db.invoice.findMany({
-    orderBy: { referenceMonth: 'asc' },
     ...(clientNumber && { where: { clientNumber } })
   });
 
-  //TODO: SORT BY DATE
-  return result;
+  const sortedResult = result.sort((a, b) => {
+    const [monthA, yearA] = a.referenceMonth.split('/');
+    const [monthB, yearB] = b.referenceMonth.split('/');
+
+    const monthIndexA = monthIndex[monthA];
+    const monthIndexB = monthIndex[monthB];
+
+    if (yearA === yearB) return monthIndexA - monthIndexB;
+
+    return parseInt(yearA) - parseInt(yearB);
+  });
+
+  return sortedResult;
 };
