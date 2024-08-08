@@ -1,11 +1,6 @@
 import { toast } from "sonner";
 import { queryClient } from "@/lib/react-query";
-
-import {
-  useQuery,
-  useMutation,
-  InvalidateQueryFilters,
-} from "@tanstack/react-query";
+import { useQuery, useMutation } from "@tanstack/react-query";
 
 import {
   getInvoices,
@@ -45,18 +40,16 @@ export const useUploadInvoice = () => {
   const { mutate: uploadMutate, isPending: uploadPending } = useMutation({
     mutationFn: uploadInvoice,
     onSuccess: () => {
-      queryClient.invalidateQueries(["invoices"] as InvalidateQueryFilters);
-      queryClient.invalidateQueries([
-        "energyInvoices",
-      ] as InvalidateQueryFilters);
-      queryClient.invalidateQueries([
-        "monetaryInvoices",
-      ] as InvalidateQueryFilters);
-
       toast.success("Invoice uploaded successfully 🚀", {
         duration: 2500,
         className: "bg-green-300 text-gray-900 text-md",
       });
+
+      setTimeout(() => {
+        queryClient.invalidateQueries({ queryKey: ["invoices"] });
+        queryClient.invalidateQueries({ queryKey: ["energyInvoices"] });
+        queryClient.invalidateQueries({ queryKey: ["monetaryInvoices"] });
+      }, 2000);
     },
     onError: () => {
       toast.error("An error occurred while uploading the invoice 🤯", {

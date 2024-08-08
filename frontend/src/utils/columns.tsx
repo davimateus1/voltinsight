@@ -42,7 +42,7 @@ export const columns: ColumnDef<Invoice>[] = [
     accessorKey: "clientNumber",
     header: "Client",
     cell: ({ row }) => (
-      <div className="capitalize">{row.getValue("clientNumber")}</div>
+      <div className="font-semibold">{row.getValue("clientNumber")}</div>
     ),
   },
   {
@@ -59,7 +59,9 @@ export const columns: ColumnDef<Invoice>[] = [
       );
     },
     cell: ({ row }) => (
-      <div className="uppercase">{row.getValue("referenceMonth")}</div>
+      <div className="uppercase font-semibold">
+        {row.getValue("referenceMonth")}
+      </div>
     ),
   },
   {
@@ -74,9 +76,11 @@ export const columns: ColumnDef<Invoice>[] = [
         currency: "BRL",
       }).format(price);
 
+      const formattedQuantity = quantity.toLocaleString("pt-BR");
+
       return (
         <div className="text-left font-medium">
-          {quantity} KWh - {formattedPrice}
+          {formattedQuantity} KWh | {formattedPrice}
         </div>
       );
     },
@@ -93,9 +97,11 @@ export const columns: ColumnDef<Invoice>[] = [
         currency: "BRL",
       }).format(price);
 
+      const formattedQuantity = quantity.toLocaleString("pt-BR");
+
       return (
         <div className="text-left font-medium">
-          {quantity} KWh - {formattedPrice}
+          {formattedQuantity} KWh | {formattedPrice}
         </div>
       );
     },
@@ -112,9 +118,11 @@ export const columns: ColumnDef<Invoice>[] = [
         currency: "BRL",
       }).format(price);
 
+      const formattedQuantity = quantity.toLocaleString("pt-BR");
+
       return (
         <div className="text-left font-medium">
-          {quantity} KWh - {formattedPrice}
+          {formattedQuantity} KWh | {formattedPrice}
         </div>
       );
     },
@@ -148,9 +156,8 @@ export const columns: ColumnDef<Invoice>[] = [
       return (
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="ghost" className="h-8 w-8 p-0">
-              <span className="sr-only">Open menu</span>
-              <MoreHorizontal className="h-4 w-4" />
+            <Button className="h-8 w-8 p-0 bg-transparent hover:bg-black/10 rounded-full">
+              <MoreHorizontal className="h-[1.2rem] w-[1.2rem] text-sky-100" />
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">

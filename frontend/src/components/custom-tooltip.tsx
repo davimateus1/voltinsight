@@ -34,7 +34,7 @@ export const CustomTooltip = ({
               :{" "}
               <b className="text-lg">
                 {isKwh
-                  ? `${item.value} kWh`
+                  ? `${item.value.toLocaleString()} kWh`
                   : item.value.toLocaleString("pt-BR", {
                       style: "currency",
                       currency: "BRL",
