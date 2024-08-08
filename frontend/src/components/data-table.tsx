@@ -114,7 +114,7 @@ export const DataTable = ({ data, isLoading }: DataTableProps) => {
             onValueChange={handleSelectChange}
           >
             <SelectTrigger className="w-[240px]">
-              <SelectValue placeholder="Client Number" />
+              <SelectValue placeholder="All Clients" />
             </SelectTrigger>
             <SelectContent>
               {getUniqueClientNumbers(data).map((clientNumber) => (

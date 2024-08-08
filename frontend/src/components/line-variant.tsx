@@ -59,7 +59,7 @@ export const LineVariant = ({
       <div className="flex items-center justify-center space-x-2">
         <Select value={clientNumber} onValueChange={handleClientNumberChange}>
           <SelectTrigger className="w-[140px] h-8">
-            <SelectValue placeholder="Client Number" />
+            <SelectValue placeholder="All Clients" />
           </SelectTrigger>
           <SelectContent>
             {getUniqueClientNumbers(selectData).map((clientNumber) => (
@@ -102,6 +102,7 @@ export const LineVariant = ({
               tickMargin={10}
               dataKey={xDataKey}
               stroke="rgba(255, 255, 255, 0.7)"
+              fontSize={14}
             />
             <Tooltip
               content={<CustomTooltip dataKeys={dataKeys} isKwh={isKwh} />}

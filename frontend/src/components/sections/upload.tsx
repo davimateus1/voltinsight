@@ -18,7 +18,7 @@ export const UploadSection = () => {
   const handleUploadFile = () => {
     if (!files) return;
     uploadMutate(files[0]);
-    setFiles(null);
+    setFiles([]);
   };
 
   return (
