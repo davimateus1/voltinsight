@@ -1,10 +1,12 @@
 import fs from 'fs';
 import { PDFExtract } from 'pdf.js-extract';
+import { v2 as cloudinary } from 'cloudinary';
 
 import { db } from '../../utils/prisma';
 import { monthIndex } from '../../utils/consts';
-
 import { replaceValue } from '../../utils/replace-value';
+
+import { extractPublicId } from '../../utils/extract-public-id';
 import { searchInfosInRange } from '../../utils/search-in-range';
 
 import {
@@ -24,7 +26,7 @@ import {
   xRangeStartClientNumber,
   xRangeStartReferenceMonth,
   yRangeStartReferenceMonth
-} from '../../contrants';
+} from '../../utils/consts';
 
 const pdfExtract = new PDFExtract();
 
@@ -73,13 +75,25 @@ export const createInvoice = async (filename: string) => {
       !values.length ||
       !clientNumber.length ||
       !referenceMonth.length
-    )
+    ) {
+      fs.unlinkSync('./src/uploads/' + filename);
       throw new Error('Invalid PDF file');
+    }
+
+    const uploadedFile = await cloudinary.uploader
+      .upload('./src/uploads/' + filename, {
+        format: 'png',
+        folder: 'voltinsight'
+      })
+      .then((result) => result.url)
+      .catch((err) => {
+        throw new Error(err.message);
+      });
 
     db.invoice
       .create({
         data: {
-          clientDocumentUrl: 'todo-url',
+          clientDocumentUrl: uploadedFile,
           clientNumber: clientNumber[0].str,
           referenceMonth: referenceMonth[0].str,
           electricEnergyPrice: replaceValue(values[0].str),
@@ -127,6 +141,11 @@ export const deleteInvoice = async (id: string) => {
 
   if (!invoice) throw new Error('Invoice not found');
 
+  if (invoice.clientDocumentUrl) {
+    const publicId = extractPublicId(invoice.clientDocumentUrl);
+    await cloudinary.uploader.destroy(publicId);
+  }
+
   await db.invoice.delete({ where: { id } });
 
   return 'Invoice deleted successfully';
@@ -136,6 +155,14 @@ export const bulkDeleteInvoices = async (ids: string[]) => {
   const invoices = await db.invoice.findMany({ where: { id: { in: ids } } });
 
   if (!invoices.length) throw new Error('Invoices not found');
+
+  const publicIds = invoices
+    .filter((invoice) => invoice.clientDocumentUrl)
+    .map((invoice) => extractPublicId(invoice.clientDocumentUrl));
+
+  if (publicIds.length) {
+    await cloudinary.api.delete_resources(publicIds);
+  }
 
   await db.invoice.deleteMany({ where: { id: { in: ids } } });
 

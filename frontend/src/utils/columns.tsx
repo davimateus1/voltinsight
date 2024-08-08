@@ -167,6 +167,32 @@ export const columns: ColumnDef<Invoice>[] = [
         deleteMutate(row.original.id);
       };
 
+      const handleDownloadInvoice = () => {
+        fetch(row.original.clientDocumentUrl)
+          .then((response) => response.blob())
+          .then((blob) => {
+            const url = window.URL.createObjectURL(blob);
+            const link = document.createElement("a");
+            link.href = url;
+            link.download = "invoice.png";
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            window.URL.revokeObjectURL(url);
+
+            toast.success("Invoice downloaded successfully! 📄🚀", {
+              duration: 2500,
+              className: "bg-green-300 text-gray-900 text-md",
+            });
+          })
+          .catch(() => {
+            toast.error("Error downloading invoice! 😢", {
+              duration: 2500,
+              className: "bg-red-300 text-gray-900 text-md",
+            });
+          });
+      };
+
       return (
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
@@ -181,7 +207,7 @@ export const columns: ColumnDef<Invoice>[] = [
               Copy client number
             </DropdownMenuItem>
             <DropdownMenuSeparator />
-            <DropdownMenuItem>
+            <DropdownMenuItem onClick={handleDownloadInvoice}>
               <Download className="h-4 w-4 mr-2" />
               Download invoice
             </DropdownMenuItem>
