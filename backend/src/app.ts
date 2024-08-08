@@ -1,8 +1,6 @@
 import Fastify from 'fastify';
 import cors from '@fastify/cors';
-
 import multipart from '@fastify/multipart';
-import { cloudinaryConfig } from './utils/cloudinary';
 
 import invoiceRoutes from './modules/invoice/invoice.route';
 import { invoiceSchemas } from './modules/invoice/invoice.schema';
@@ -10,8 +8,6 @@ import { invoiceSchemas } from './modules/invoice/invoice.schema';
 const server = Fastify();
 
 const start = async () => {
-  cloudinaryConfig();
-
   for (const schema of invoiceSchemas) {
     server.addSchema(schema);
   }

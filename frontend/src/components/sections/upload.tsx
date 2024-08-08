@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Loader2 } from "lucide-react";
+import { FileIcon, Loader2 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { useUploadInvoice } from "@/services/hooks";
@@ -12,13 +12,12 @@ import {
 } from "@/components/file-input";
 
 export const UploadSection = () => {
-  const { uploadMutate, uploadPending } = useUploadInvoice();
   const [files, setFiles] = useState<File[] | null>(null);
+  const { uploadMutate, uploadPending } = useUploadInvoice({ setFiles });
 
   const handleUploadFile = () => {
     if (!files) return;
     uploadMutate(files[0]);
-    setFiles([]);
   };
 
   return (
@@ -38,9 +37,17 @@ export const UploadSection = () => {
             <FileUploaderItem
               index={i}
               key={file.name}
-              className="py-4 px-2 bg-sky-400 text-gray-800"
+              className="py-6 px-2 bg-sky-400 text-gray-800"
             >
-              {file.name}
+              <div className="flex items-center justify-center space-x-1">
+                <FileIcon className="h-6 w-6" />
+                <div className="space-y-1">
+                  <p className="text-gray-900 font-bold">{file.name}</p>
+                  <p className="text-gray-700 font-semibold">
+                    {file.size} bytes
+                  </p>
+                </div>
+              </div>
             </FileUploaderItem>
           ))}
         </FileUploaderContent>

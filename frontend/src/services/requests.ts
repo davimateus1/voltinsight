@@ -28,3 +28,11 @@ export const uploadInvoice = async (file: File): Promise<void> => {
     headers: { "Content-Type": "multipart/form-data" },
   });
 };
+
+export const deleteInvoice = async (id: string): Promise<void> => {
+  await apiInstance.delete(`/invoices/${id}`);
+};
+
+export const bulkDeleteInvoices = async (ids: string[]): Promise<void> => {
+  await apiInstance.post("/invoices/bulk-delete", { ids });
+};

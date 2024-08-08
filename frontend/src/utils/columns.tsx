@@ -4,7 +4,14 @@ import { Button } from "@/components/ui/button";
 
 import { ColumnDef } from "@tanstack/react-table";
 import { Checkbox } from "@/components/ui/checkbox";
-import { ArrowUpDown, MoreHorizontal } from "lucide-react";
+import {
+  Trash,
+  Loader2,
+  CopyPlus,
+  Download,
+  ArrowUpDown,
+  MoreHorizontal,
+} from "lucide-react";
 
 import {
   DropdownMenu,
@@ -14,6 +21,7 @@ import {
   DropdownMenuContent,
   DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
+import { useDeleteInvoice } from "@/services/hooks";
 
 export const columns: ColumnDef<Invoice>[] = [
   {
@@ -145,6 +153,8 @@ export const columns: ColumnDef<Invoice>[] = [
     id: "actions",
     enableHiding: false,
     cell: ({ row }) => {
+      const { deleteMutate, deletePending } = useDeleteInvoice();
+
       const handleCopyClientNumber = () => {
         navigator.clipboard.writeText(row.original.clientNumber);
         toast.success("Copied client number to clipboard! 📋🚀", {
@@ -153,20 +163,41 @@ export const columns: ColumnDef<Invoice>[] = [
         });
       };
 
+      const handleDeleteInvoice = () => {
+        deleteMutate(row.original.id);
+      };
+
       return (
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button className="h-8 w-8 p-0 bg-transparent hover:bg-black/10 rounded-full">
-              <MoreHorizontal className="h-[1.2rem] w-[1.2rem] text-sky-100" />
+            <Button className="h-8 w-8 p-0 bg-black/10 hover:bg-black/20 rounded-full">
+              <MoreHorizontal className="h-[1.2rem] w-[1.2rem] text-sky-400" />
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
-            <DropdownMenuLabel>Actions</DropdownMenuLabel>
+            <DropdownMenuLabel className="text-md">Actions</DropdownMenuLabel>
             <DropdownMenuItem onClick={handleCopyClientNumber}>
+              <CopyPlus className="h-4 w-4 mr-2" />
               Copy client number
             </DropdownMenuItem>
             <DropdownMenuSeparator />
-            <DropdownMenuItem>Download invoice</DropdownMenuItem>
+            <DropdownMenuItem>
+              <Download className="h-4 w-4 mr-2" />
+              Download invoice
+            </DropdownMenuItem>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem
+              disabled={deletePending}
+              className="text-red-400"
+              onClick={handleDeleteInvoice}
+            >
+              {deletePending ? (
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              ) : (
+                <Trash className="h-4 w-4 mr-2" />
+              )}
+              Delete invoice
+            </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
       );

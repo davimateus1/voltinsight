@@ -1,8 +1,9 @@
 import fs from 'fs';
 import { PDFExtract } from 'pdf.js-extract';
-import { v2 as cloudinary } from 'cloudinary';
 
 import { db } from '../../utils/prisma';
+import { monthIndex } from '../../utils/consts';
+
 import { replaceValue } from '../../utils/replace-value';
 import { searchInfosInRange } from '../../utils/search-in-range';
 
@@ -67,17 +68,18 @@ export const createInvoice = async (filename: string) => {
       yRangeEndReferenceMonth
     );
 
-    const uploadedFile = await cloudinary.uploader
-      .upload('./src/uploads/' + filename, { folder: 'voltinsight' })
-      .then((result) => result.url)
-      .catch((err) => {
-        throw new Error(err.message);
-      });
+    if (
+      !quantities.length ||
+      !values.length ||
+      !clientNumber.length ||
+      !referenceMonth.length
+    )
+      throw new Error('Invalid PDF file');
 
     db.invoice
       .create({
         data: {
-          clientDocumentUrl: uploadedFile,
+          clientDocumentUrl: 'todo-url',
           clientNumber: clientNumber[0].str,
           referenceMonth: referenceMonth[0].str,
           electricEnergyPrice: replaceValue(values[0].str),
@@ -90,6 +92,7 @@ export const createInvoice = async (filename: string) => {
         }
       })
       .catch((err) => {
+        console.error('Error creating invoice:', err);
         throw new Error(err.message);
       });
 
@@ -100,21 +103,6 @@ export const createInvoice = async (filename: string) => {
 };
 
 export const getInvoices = async (clientNumber?: string) => {
-  const monthIndex: { [key: string]: number } = {
-    JAN: 0,
-    FEV: 1,
-    MAR: 2,
-    ABR: 3,
-    MAI: 4,
-    JUN: 5,
-    JUL: 6,
-    AGO: 7,
-    SET: 8,
-    OUT: 9,
-    NOV: 10,
-    DEZ: 11
-  };
-
   const result = await db.invoice.findMany({
     ...(clientNumber && { where: { clientNumber } })
   });
@@ -132,4 +120,24 @@ export const getInvoices = async (clientNumber?: string) => {
   });
 
   return sortedResult;
+};
+
+export const deleteInvoice = async (id: string) => {
+  const invoice = await db.invoice.findUnique({ where: { id } });
+
+  if (!invoice) throw new Error('Invoice not found');
+
+  await db.invoice.delete({ where: { id } });
+
+  return 'Invoice deleted successfully';
+};
+
+export const bulkDeleteInvoices = async (ids: string[]) => {
+  const invoices = await db.invoice.findMany({ where: { id: { in: ids } } });
+
+  if (!invoices.length) throw new Error('Invoices not found');
+
+  await db.invoice.deleteMany({ where: { id: { in: ids } } });
+
+  return 'Invoices deleted successfully';
 };

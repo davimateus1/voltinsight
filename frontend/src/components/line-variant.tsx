@@ -58,7 +58,7 @@ export const LineVariant = ({
     <div className="w-[46.5%] space-y-1 flex flex-col items-end">
       <div className="flex items-center justify-center space-x-2">
         <Select value={clientNumber} onValueChange={handleClientNumberChange}>
-          <SelectTrigger className="w-[140px] h-8">
+          <SelectTrigger className="w-[140px] h-8" disabled={!selectData.length}>
             <SelectValue placeholder="All Clients" />
           </SelectTrigger>
           <SelectContent>
@@ -73,7 +73,7 @@ export const LineVariant = ({
           variant="outline"
           onClick={handleClear}
           disabled={!clientNumber}
-          className="transition-all duration-500 w-[2rem] p-1 h-[2rem] rounded-full"
+          className="transition-all duration-500 w-[2rem] p-1 h-[2rem] rounded-full bg-sky-200"
         >
           <XIcon className="h-[1rem] w-[1rem] text-red-500" />
         </Button>

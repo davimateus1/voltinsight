@@ -3,7 +3,9 @@ import { FastifyInstance } from 'fastify';
 
 import {
   getInvoicesHandler,
-  registerInvoiceHandler
+  deleteInvoiceHandler,
+  registerInvoiceHandler,
+  bulkDeleteInvoiceHandler
 } from './invoice.controller';
 
 const invoiceRoutes = async (server: FastifyInstance) => {
@@ -31,6 +33,32 @@ const invoiceRoutes = async (server: FastifyInstance) => {
       }
     },
     getInvoicesHandler
+  );
+
+  server.delete(
+    '/:id',
+    {
+      schema: {
+        params: $ref('deleteInvoiceSchema'),
+        response: {
+          200: $ref('deleteInvoiceResponseSchema')
+        }
+      }
+    },
+    deleteInvoiceHandler
+  );
+
+  server.post(
+    '/bulk-delete',
+    {
+      schema: {
+        body: $ref('bulkDeleteInvoiceSchema'),
+        response: {
+          200: $ref('bulkDeleteInvoiceResponseSchema')
+        }
+      }
+    },
+    bulkDeleteInvoiceHandler
   );
 };
 
